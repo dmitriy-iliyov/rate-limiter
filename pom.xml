@@ -19,6 +19,7 @@
 
     <modules>
         <module>rate-limiter</module>
+        <module>rate-limiter-example</module>
     </modules>
 
     <properties>

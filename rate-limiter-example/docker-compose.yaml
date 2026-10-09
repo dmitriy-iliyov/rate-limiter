@@ -1,0 +1,20 @@
+services:
+  rate-limiter-example:
+    container_name: rate-limiter-example
+    build:
+      context: ..
+      dockerfile: rate-limiter-example/Dockerfile
+    image: rate-limiter-example
+    depends_on:
+      - rate-limiter-redis
+    environment:
+      SPRING_DATA_REDIS_HOST: rate-limiter-redis
+      SPRING_DATA_REDIS_PORT: 6379
+    ports:
+      - "8080:8080"
+
+  rate-limiter-redis:
+    container_name: rate-limiter-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
