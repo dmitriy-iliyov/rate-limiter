@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
+/**
+ * A {@link RateLimitRepository} that applies one {@link LimitingStrategy} to one target URL.
+ */
 @Slf4j
 @Builder
 public class DefaultRateLimitRepository implements RateLimitRepository {

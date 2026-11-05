@@ -9,6 +9,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Sliding window with a ban: a client may make {@code maxAttemptCount} attempts within any {@code windowSize}.
+ * The attempt over the limit bans the client for {@code lockTime} and clears its window; attempts made during the
+ * ban are rejected and not counted.
+ * <p>
+ * Time is taken from the Redis server, so the clocks of application instances do not affect the window.
+ * <p>
+ * Runs the {@code banningSlidingWindowScript} bean of {@link ScriptAutoConfiguration}.
+ * <p>
+ * The Redis key of a client is {@code keyTemplate} formatted with the client key; the ban marker lives under the
+ * same key prefixed with {@code blocked:}. The two keys may hash to different slots, so the strategy does not work
+ * on Redis Cluster.
+ * <p>
+ * The {@code redisTemplate} has to serialize keys and values with
+ * {@link org.springframework.data.redis.serializer.StringRedisSerializer}: the script arguments go through the value
+ * serializer. Construction fails with {@link NullPointerException} on a missing argument and with
+ * {@link IllegalArgumentException} on a {@code keyTemplate} without {@code %s}, a non-positive
+ * {@code maxAttemptCount} or a duration shorter than 1 ms.
+ */
 @Builder
 public class BanningSlidingWindowLimitingStrategy implements LimitingStrategy {
 

@@ -157,7 +157,20 @@ all clients would share one counter. Durations must be at least 1 ms and `maxAtt
 
 ### Client Key
 `IpRateLimitFilter` uses `request.getRemoteAddr()` as the key. To limit by something else (user id, API key),
-extend `RateLimitFilter` and implement `extractKey`.
+extend `RateLimitFilter` and implement `extractKey`:
+```java
+public class UserIdRateLimitFilter extends RateLimitFilter {
+
+    public UserIdRateLimitFilter(ObjectMapper mapper, List<RateLimitRepository> repositories) {
+        super(mapper, repositories);
+    }
+
+    @Override
+    protected String extractKey(HttpServletRequest request) {
+        return request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : request.getRemoteAddr();
+    }
+}
+```
 `extractKey` must not return `null`: a `null` key is treated as a bug in the subclass, and the request fails with
 `IllegalStateException` (`500`) instead of passing the limit. The matching and counting itself
 (`doFilterInternal`) is `final`; besides `extractKey`, the filter is customised through `handleBlocked` and

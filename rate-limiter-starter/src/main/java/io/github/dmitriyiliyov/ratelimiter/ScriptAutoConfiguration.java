@@ -7,6 +7,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 
+/**
+ * Registers the Lua scripts of the strategies as {@link DefaultRedisScript} beans: {@code banningCountBasedScript},
+ * {@code banningSlidingWindowScript} and {@code slidingWindowScript}. The beans share one type, so they are
+ * injected by name, and a bean of the application with one of these names replaces only that script.
+ * <p>
+ * Strategies, repositories and the filter are not auto-configured: each endpoint needs its own policy, so the
+ * application declares them as its own beans.
+ */
 @AutoConfiguration
 public class ScriptAutoConfiguration {
 
