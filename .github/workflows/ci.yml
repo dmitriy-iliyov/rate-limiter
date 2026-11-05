@@ -21,7 +21,7 @@ jobs:
           cache: maven
 
       - name: Build and run tests
-        run: mvn clean verify
+        run: mvn clean verify -Dgpg.skip=true
 
       - name: Check JaCoCo report exists
         run: find . -name "jacoco.xml" -type f
