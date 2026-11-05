@@ -2,6 +2,8 @@ package io.github.dmitriyiliyov.ratelimiter;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.annotation.ImportCandidates;
@@ -24,6 +26,25 @@ class ScriptAutoConfigurationIntegrationTest {
             assertScript(context.getBean("banningSlidingWindowScript", DefaultRedisScript.class), "blocked_key");
             assertScript(context.getBean("slidingWindowScript", DefaultRedisScript.class), "ZADD");
         });
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = {"banningCountBasedScript", "banningSlidingWindowScript", "slidingWindowScript"})
+    @DisplayName("IT context when user declares a script bean with the same name should replace only that script")
+    void context_whenUserDeclaresScriptBeanWithSameName_shouldReplaceOnlyThatScript(String beanName) {
+        // given
+        DefaultRedisScript<Boolean> userScript = new DefaultRedisScript<>("return 1", Boolean.class);
+
+        // when & then
+        contextRunner
+                .withBean(beanName, DefaultRedisScript.class, () -> userScript)
+                .run(context -> {
+                    assertThat(context).getBeans(DefaultRedisScript.class).hasSize(3);
+                    assertThat(context.getBean(beanName)).isSameAs(userScript);
+                    assertThat(context).hasBean("banningCountBasedScript")
+                            .hasBean("banningSlidingWindowScript")
+                            .hasBean("slidingWindowScript");
+                });
     }
 
     @Test

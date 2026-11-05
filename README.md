@@ -141,7 +141,8 @@ The auto-configuration registers only the Lua scripts, one `DefaultRedisScript<B
 | `banningSlidingWindowScript` | `banning_sliding_window.lua` | `BanningSlidingWindowLimitingStrategy` |
 | `slidingWindowScript` | `sliding_window.lua` | `SlidingWindowLimitingStrategy` |
 
-All three beans have the same type, so inject them **by name** (`@Qualifier`).
+All three beans have the same type, so inject them **by name** (`@Qualifier`). To replace a script, declare your
+own `DefaultRedisScript<Boolean>` bean with the same name; the other two scripts are still registered.
 
 ### Strategies
 | Strategy | Behaviour | Parameters |
