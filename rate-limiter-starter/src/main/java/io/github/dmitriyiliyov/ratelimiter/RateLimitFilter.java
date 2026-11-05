@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.Objects;
 @Slf4j
 public abstract class RateLimitFilter extends OncePerRequestFilter {
 
+    private static final UrlPathHelper PATH_HELPER = new UrlPathHelper();
     private final ObjectMapper mapper;
     protected final Map<String, RateLimitRepository> repositoriesMap;
 
@@ -37,7 +39,7 @@ public abstract class RateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        RateLimitRepository repository = repositoriesMap.get(request.getRequestURI());
+        RateLimitRepository repository = repositoriesMap.get(PATH_HELPER.getRequestUri(request));
         if (repository != null) {
             String key = extractKey(request);
             RateLimitStatus status = repository.increment(key);

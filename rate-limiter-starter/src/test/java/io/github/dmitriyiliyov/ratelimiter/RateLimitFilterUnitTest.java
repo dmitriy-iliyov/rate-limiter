@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -154,5 +156,47 @@ class RateLimitFilterUnitTest {
         verify(writer, times(1)).write(expectedJson);
         verifyNoMoreInteractions(repository);
         verifyNoInteractions(filterChain);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = {
+            "/api/%67uarded",
+            "/api/gu%61rded",
+            "/api/%67%75%61%72%64%65%64",
+            "/api/guarded;jsessionid=1",
+            "/api//guarded",
+            "/api%2Fguarded"
+    })
+    @DisplayName("UT doFilterInternal() when URI is another spelling of the target URL should still block it")
+    void doFilterInternal_whenUriIsAnotherSpellingOfTargetUrl_shouldStillBlockIt(String requestUri)
+            throws ServletException, IOException {
+        // given
+        when(request.getRequestURI()).thenReturn(requestUri);
+        when(repository.increment(ip)).thenReturn(RateLimitStatus.BLOCKED);
+        when(response.getWriter()).thenReturn(writer);
+        when(mapper.writeValueAsString(any())).thenReturn("{}");
+
+        // when
+        tested.doFilterInternal(request, response, filterChain);
+
+        // then
+        verify(repository, times(1)).increment(ip);
+        verify(response, times(1)).setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+        verifyNoInteractions(filterChain);
+    }
+
+    @Test
+    @DisplayName("UT doFilterInternal() when URI has a trailing slash should pass to filterChain without counting")
+    void doFilterInternal_whenUriHasTrailingSlash_shouldPassToFilterChainWithoutCounting()
+            throws ServletException, IOException {
+        // given
+        when(request.getRequestURI()).thenReturn(targetUrl + "/");
+
+        // when
+        tested.doFilterInternal(request, response, filterChain);
+
+        // then
+        verify(repository, never()).increment(any());
+        verify(filterChain, times(1)).doFilter(request, response);
     }
 }

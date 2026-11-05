@@ -34,8 +34,10 @@ policy, so strategies, repositories and the filter are declared as your own bean
 - **Fail-closed on Redis errors** - if Redis is unavailable, requests to rate-limited endpoints fail with `500`.
   Requests to other endpoints are not affected.
 - **One repository per URL** - registering two repositories with the same `targetUrl` fails at startup.
-- **Exact URL match** - `targetUrl` is compared with `request.getRequestURI()` as is, including the context path.
-  `/api/login/` or `/api/login;jsessionid=...` are not matched.
+- **Exact path match** - `targetUrl` is compared with the request URI including the context path, after
+  percent-encoding is decoded and `;` path parameters and duplicate slashes are removed, so `/api/%6Cogin`,
+  `/api/login;jsessionid=...` and `/api//login` all count against `/api/login`. Patterns are not supported, and
+  `/api/login/` is a different URL.
 - **Limiting by IP does not stop clients with many addresses** - botnets, rotating proxies and IPv6 clients, which
   usually own a whole `/64`, get a separate limit for every address. Limit by user or API key where it matters.
 
