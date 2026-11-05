@@ -159,7 +159,9 @@ all clients would share one counter. Durations must be at least 1 ms and `maxAtt
 `IpRateLimitFilter` uses `request.getRemoteAddr()` as the key. To limit by something else (user id, API key),
 extend `RateLimitFilter` and implement `extractKey`.
 `extractKey` must not return `null`: a `null` key is treated as a bug in the subclass, and the request fails with
-`IllegalStateException` (`500`) instead of passing the limit.
+`IllegalStateException` (`500`) instead of passing the limit. The matching and counting itself
+(`doFilterInternal`) is `final`; besides `extractKey`, the filter is customised through `handleBlocked` and
+`shouldNotFilter`.
 
 Behind a reverse proxy or load balancer, `getRemoteAddr()` returns the address of the proxy, so all clients would
 share one limit. Let Tomcat resolve the client address from `X-Forwarded-For` and keep using `IpRateLimitFilter`:

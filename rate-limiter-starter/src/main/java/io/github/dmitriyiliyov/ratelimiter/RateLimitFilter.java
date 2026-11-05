@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,7 +24,7 @@ public abstract class RateLimitFilter extends OncePerRequestFilter {
 
     private static final UrlPathHelper PATH_HELPER = new UrlPathHelper();
     private final ObjectMapper mapper;
-    protected final Map<String, RateLimitRepository> repositoriesMap;
+    private final Map<String, RateLimitRepository> repositoriesMap;
 
     public RateLimitFilter(ObjectMapper mapper, List<RateLimitRepository> repositories) {
         Objects.requireNonNull(mapper, "mapper cannot be null");
@@ -38,7 +39,9 @@ public abstract class RateLimitFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected final void doFilterInternal(@NonNull HttpServletRequest request,
+                                          @NonNull HttpServletResponse response,
+                                          @NonNull FilterChain filterChain) throws ServletException, IOException {
         RateLimitRepository repository = repositoriesMap.get(PATH_HELPER.getRequestUri(request));
         if (repository != null) {
             String key = extractKey(request);
