@@ -56,7 +56,7 @@ From the repository root:
 docker run -d -p 6379:6379 redis:7-alpine
 ./mvnw install -DskipTests -Dgpg.skip=true
 ./mvnw -f rate-limiter-example/pom.xml package
-java -jar rate-limiter-example/target/rate-limiter-example-1.0.0.jar
+java -jar rate-limiter-example/target/rate-limiter-example-1.0.1.jar
 ```
 
 ## Postman

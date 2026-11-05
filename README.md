@@ -48,7 +48,7 @@ policy, so strategies, repositories and the filter are declared as your own bean
   <dependency>
       <groupId>io.github.dmitriy-iliyov</groupId>
       <artifactId>rate-limiter-starter</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
   </dependency>
 ```
 `spring-boot-starter-data-redis` comes with the starter, so the connection is configured with the usual

@@ -11,7 +11,7 @@
 
     <groupId>io.github.dmitriy-iliyov</groupId>
     <artifactId>rate-limiter-example</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>rate-limiter-example</name>
     <description>Example application using the rate-limiter starter</description>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>io.github.dmitriy-iliyov</groupId>
             <artifactId>rate-limiter-starter</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
