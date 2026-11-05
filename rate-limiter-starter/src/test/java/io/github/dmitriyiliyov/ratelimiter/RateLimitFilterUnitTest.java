@@ -186,6 +186,20 @@ class RateLimitFilterUnitTest {
     }
 
     @Test
+    @DisplayName("UT doFilterInternal() when extracted key is null should throw IllegalStateException and not pass")
+    void doFilterInternal_whenExtractedKeyIsNull_shouldThrowIllegalStateExceptionAndNotPass() {
+        // given
+        ip = null;
+        when(request.getRequestURI()).thenReturn(targetUrl);
+
+        // when & then
+        assertThatThrownBy(() -> tested.doFilterInternal(request, response, filterChain))
+                .isInstanceOf(IllegalStateException.class);
+        verify(repository, never()).increment(any());
+        verifyNoInteractions(filterChain, response);
+    }
+
+    @Test
     @DisplayName("UT doFilterInternal() when URI has a trailing slash should pass to filterChain without counting")
     void doFilterInternal_whenUriHasTrailingSlash_shouldPassToFilterChainWithoutCounting()
             throws ServletException, IOException {

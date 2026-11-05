@@ -42,6 +42,9 @@ public abstract class RateLimitFilter extends OncePerRequestFilter {
         RateLimitRepository repository = repositoriesMap.get(PATH_HELPER.getRequestUri(request));
         if (repository != null) {
             String key = extractKey(request);
+            if (key == null) {
+                throw new IllegalStateException("extractKey returned null for " + repository.getTargetUrl());
+            }
             RateLimitStatus status = repository.increment(key);
             if (RateLimitStatus.BLOCKED == status) {
                 log.debug("Key {} is blocked", key);
